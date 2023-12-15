@@ -11,3 +11,4 @@ packaging==23.2
 Werkzeug==3.0.1
 zope.event==5.0
 zope.interface==6.1
+nanoid
