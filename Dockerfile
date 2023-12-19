@@ -9,6 +9,7 @@
 FROM pypy:3.10
 
 # FROM python:3.11.7
+# FROM python:3.12.1
 
 # Set the working directory to /app
 WORKDIR /app

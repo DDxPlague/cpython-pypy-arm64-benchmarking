@@ -18,7 +18,7 @@ def get_id():
 
 def put_url_id_in_dynamo(url_id, dynamodb_table_name, aws_region):
     #TODO: move cliant initialization out to main function
-    dynamodb = boto3.resource('dynamodb')
+    dynamodb = boto3.resource('dynamodb', region_name=aws_region)
 
     url_table = dynamodb.Table(dynamodb_table_name)
 
@@ -40,5 +40,5 @@ def index():
 @app.route("/shorten_url")
 def shorten_url():
     url_id = get_id()
-    return put_url_id_in_dynamo(url_id, dynamodb_table_name)
+    return put_url_id_in_dynamo(url_id, dynamodb_table_name, aws_region)
     
