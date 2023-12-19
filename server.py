@@ -9,6 +9,8 @@ app = Flask(__name__)
 flask_debug = os.environ.get("FLASK_DEBUG", False)
 aws_region = os.environ.get("AWS_REGION", "us-west-2")
 
+dynamo_db_client = boto3.resource('dynamodb', aws_region)
+
 app.config.update({"DEBUG": bool(flask_debug)})
 dynamodb_table_name="python_url_shortener"
 
@@ -16,11 +18,10 @@ def get_id():
     id = generate(size=10)
     return id
 
-def put_url_id_in_dynamo(url_id, dynamodb_table_name, aws_region):
+def put_url_id_in_dynamo(url_id, dynamodb_table_name, dynamo_db_client):
     #TODO: move cliant initialization out to main function
-    dynamodb = boto3.resource('dynamodb', region_name=aws_region)
 
-    url_table = dynamodb.Table(dynamodb_table_name)
+    url_table = dynamo_db_client.Table(dynamodb_table_name)
 
     response = url_table.put_item(
         Item={
@@ -40,5 +41,5 @@ def index():
 @app.route("/shorten_url")
 def shorten_url():
     url_id = get_id()
-    return put_url_id_in_dynamo(url_id, dynamodb_table_name, aws_region)
+    return put_url_id_in_dynamo(url_id, dynamodb_table_name, dynamo_db_client)
     
