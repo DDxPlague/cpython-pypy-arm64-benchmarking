@@ -7,6 +7,7 @@ import boto3
 app = Flask(__name__)
 
 flask_debug = os.environ.get("FLASK_DEBUG", False)
+aws_region = os.environ.get("AWS_REGION", "us-west-2")
 
 app.config.update({"DEBUG": bool(flask_debug)})
 dynamodb_table_name="python_url_shortener"
@@ -15,7 +16,7 @@ def get_id():
     id = generate(size=10)
     return id
 
-def put_url_id_in_dynamo(url_id, dynamodb_table_name):
+def put_url_id_in_dynamo(url_id, dynamodb_table_name, aws_region):
     #TODO: move cliant initialization out to main function
     dynamodb = boto3.resource('dynamodb')
 
