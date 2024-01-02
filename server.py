@@ -33,6 +33,19 @@ def put_url_id_in_dynamo(url_id, dynamodb_table_name, dynamo_db_client):
     print(response)
     return response
 
+def put_encrypted_data_in_dynamo(encrypt_key, encrypted_data, encrypted_iv, dynamodb_table_name, dynamo_db_client):
+
+    encrypted_table = dynamo_db_client.Table(dynamodb_table_name)
+
+    response = encrypted_table.put_item(
+        Item={
+            "encrypt_key" : encrypt_key,
+            "data": encrypted_data,
+            "iv": encrypted_iv
+        }
+    )
+    return response
+
 @app.route("/")
 def index():
     simple_date = datetime.now()
@@ -52,15 +65,15 @@ def test_aes_encrypt():
     data = data_to_encrypt.encode('utf-8')
     cipher_encrypt = AES.new(key, AES.MODE_CFB)
     ciphered_bytes = cipher_encrypt.encrypt(data)
-
     iv = cipher_encrypt.iv
-    # ciphered_data = ciphered_bytes
+
+    put_encrypted_data_in_dynamo(key, ciphered_bytes, iv, "encrypted_dynamo_table", dynamo_db_client)
 
     cipher_decrypt = AES.new(key, AES.MODE_CFB, iv=iv)
     deciphered_bytes = cipher_decrypt.decrypt(ciphered_bytes)
     decrypted_data = deciphered_bytes.decode('utf-8')
 
-    # assert data_to_encrypt == decrypted_data, 'Original data does not match the result'
+    assert data_to_encrypt == decrypted_data, 'Original data does not match the result'
     result = ("original data: " + str(data_to_encrypt) + " | encrypted data: " + str(ciphered_bytes) + " | decrypted data: " + str(decrypted_data))
 
     return (result)
