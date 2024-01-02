@@ -5,13 +5,14 @@ from nanoid import generate
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 import boto3
+from botocore.config import Config
 
 app = Flask(__name__)
 
 flask_debug = os.environ.get("FLASK_DEBUG", False)
 aws_region = os.environ.get("AWS_REGION", "us-west-2")
 
-dynamo_db_client = boto3.resource('dynamodb', aws_region)
+dynamo_db_client = boto3.resource('dynamodb', aws_region, config=Config(retries={"max_attempts": 2, "mode": "adaptive"}, max_pool_connections=1024,))
 
 app.config.update({"DEBUG": bool(flask_debug)})
 dynamodb_table_name="python_url_shortener"
